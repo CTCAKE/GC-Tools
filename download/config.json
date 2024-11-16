@@ -1,0 +1,217 @@
+{
+  "folderStructure": {
+    "resources": "./res.zip",
+    "data": "./data/",
+    "packets": "./packets/",
+    "scripts": "resources:Scripts/",
+    "plugins": "./plugins/",
+    "cache": "./cache/"
+  },
+  "databaseInfo": {
+    "server": {
+      "connectionUri": "mongodb://localhost:27017",
+      "collection": "grasscutter"
+    },
+    "game": {
+      "connectionUri": "mongodb://localhost:27017",
+      "collection": "grasscutter"
+    }
+  },
+  "language": {
+    "language": "zh_CN",
+    "fallback": "en_US",
+    "document": "EN"
+  },
+  "account": {
+    "autoCreate": true,
+    "EXPERIMENTAL_RealPassword": false,
+    "defaultPermissions": [
+      "*"
+    ],
+    "maxPlayer": -1
+  },
+  "server": {
+    "debugWhitelist": [],
+    "debugBlacklist": [],
+    "runMode": "HYBRID",
+    "logCommands": true,
+    "fastRequire": true,
+    "http": {
+      "startImmediately": false,
+      "bindAddress": "0.0.0.0",
+      "bindPort": 54321,
+      "accessAddress": "192.168.0.104",
+      "accessPort": 0,
+      "encryption": {
+        "useEncryption": true,
+        "useInRouting": true,
+        "keystore": "./keystore.p12",
+        "keystorePassword": "123456"
+      },
+      "policies": {
+        "cors": {
+          "enabled": true,
+          "allowedOrigins": [
+            "*"
+          ]
+        }
+      },
+      "files": {
+        "indexFile": "./index.html",
+        "errorFile": "./404.html"
+      }
+    },
+    "game": {
+      "bindAddress": "0.0.0.0",
+      "bindPort": 22102,
+      "accessAddress": "192.168.0.104",
+      "accessPort": 0,
+      "useUniquePacketKey": true,
+      "loadEntitiesForPlayerRange": 300,
+      "enableScriptInBigWorld": true,
+      "enableConsole": true,
+      "kcpInterval": 20,
+      "logPackets": "NONE",
+      "isShowPacketPayload": false,
+      "isShowLoopPackets": false,
+      "cacheSceneEntitiesEveryRun": false,
+      "gameOptions": {
+        "inventoryLimits": {
+          "weapons": 2000,
+          "relics": 2000,
+          "materials": 2000,
+          "furniture": 2000,
+          "all": 30000
+        },
+        "avatarLimits": {
+          "singlePlayerTeam": 4,
+          "multiplayerTeam": 4
+        },
+        "sceneEntityLimit": 1000,
+        "watchGachaConfig": false,
+        "enableShopItems": true,
+        "staminaUsage": true,
+        "energyUsage": true,
+        "fishhookTeleport": true,
+        "trialCostumes": false,
+        "questing": {
+          "enabled": true
+        },
+        "resinOptions": {
+          "resinUsage": false,
+          "cap": 160,
+          "rechargeTime": 480
+        },
+        "rates": {
+          "adventureExp": 1,
+          "mora": 1,
+          "leyLines": 1
+        },
+        "handbook": {
+          "enable": false,
+          "allowCommands": true,
+          "limits": {
+            "enabled": false,
+            "interval": 3,
+            "maxRequests": 10,
+            "maxEntities": 25
+          },
+          "server": {
+            "enforced": false,
+            "address": "127.0.0.1",
+            "port": 443,
+            "canChange": true
+          }
+        }
+      },
+      "joinOptions": {
+        "welcomeEmotes": [
+          2007,
+          1002,
+          4010
+        ],
+        "welcomeMessage": "<color=#ff0000>欢</color><color=#f60609>迎</color><color=#ed0d12>回</color><color=#e4131b>来</color><color=#db1924>，</color><color=#d1202e>主</color><color=#c82637>人</color><color=#bf2d40>ヾ</color><color=#b63349>(</color><color=#ad3952>?</color><color=#a4405b>?</color><color=#9b4664>▽</color><color=#924c6d>?</color><color=#895376>)</color><color=#805980>ノ</color><color=#765f89>，</color><color=#6d6692>输</color><color=#646c9b>入</color><color=#5b72a4>“</color><color=#5279ad>h</color><color=#497fb6>e</color><color=#4086bf>l</color><color=#378cc8>p</color><color=#2e92d1>”</color><color=#2499db>获</color><color=#1b9fe4>取</color><color=#12a5ed>帮</color><color=#09acf6>助</color>",
+        "welcomeMail": {
+          "title": "Welcome to Grasscutter!",
+          "content": "Hi there!\r\nFirst of all, welcome to Grasscutter. If you have any issues, please let us know so that Lawnmower can help you! \r\n\r\nCheck out our:\r\n<type=\"browser\" text=\"Discord\" href=\"https://discord.gg/T5vZU6UyeG\"/>\n",
+          "sender": "Lawnmower",
+          "items": [
+            {
+              "itemId": 13509,
+              "itemCount": 1,
+              "itemLevel": 1
+            },
+            {
+              "itemId": 201,
+              "itemCount": 99999,
+              "itemLevel": 1
+            }
+          ]
+        }
+      },
+      "serverAccount": {
+        "avatarId": 10000077,
+        "nameCardId": 210148,
+        "adventureRank": 60,
+        "worldLevel": 1,
+        "nickName": "<color=#ff0000>瑶</color><color=#bf2d40>瑶</color><color=#805980>吾</color><color=#4086bf>妻</color>",
+        "signature": "Welcome to Grasscutter!"
+      },
+      "visionOptions": [
+        {
+          "name": "VISION_LEVEL_NORMAL",
+          "visionRange": 80,
+          "gridWidth": 20
+        },
+        {
+          "name": "VISION_LEVEL_LITTLE_REMOTE",
+          "visionRange": 16,
+          "gridWidth": 40
+        },
+        {
+          "name": "VISION_LEVEL_REMOTE",
+          "visionRange": 1000,
+          "gridWidth": 250
+        },
+        {
+          "name": "VISION_LEVEL_SUPER",
+          "visionRange": 4000,
+          "gridWidth": 1000
+        },
+        {
+          "name": "VISION_LEVEL_NEARBY",
+          "visionRange": 40,
+          "gridWidth": 20
+        },
+        {
+          "name": "VISION_LEVEL_SUPER_NEARBY",
+          "visionRange": 20,
+          "gridWidth": 20
+        }
+      ]
+    },
+    "dispatch": {
+      "regions": [],
+      "dispatchUrl": "ws://127.0.0.1:1111",
+      "encryptionKey": "UPGYonA9vH2TnqheNpnPn2H82iijDseCFE8J9h0agQQ=",
+      "dispatchKey": "Ggh6queYBFNYsDhr+ZSnynLV69Uw0F0+haVNs7jj4/8=",
+      "defaultName": "Grasscutter",
+      "logRequests": "NONE"
+    },
+    "debugMode": {
+      "serverLoggerLevel": {
+        "levelInt": 10000,
+        "levelStr": "DEBUG"
+      },
+      "servicesLoggersLevel": {
+        "levelInt": 20000,
+        "levelStr": "INFO"
+      },
+      "logPackets": "ALL",
+      "isShowPacketPayload": false,
+      "isShowLoopPackets": false,
+      "logRequests": "ALL"
+    }
+  },
+  "version": 13
+}
