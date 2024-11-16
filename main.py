@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import time
 import threading
 from colorama import  init,Fore,Back,Style
@@ -39,22 +40,16 @@ def download_gc():
                     ask(f'选择的服务端版本({gamelist[game_version-1]['version']})与您的游戏版本({config['game_version']})不一致，是否继续？(y/n)')
                     i = input()
                     if i == 'y':
-                        warn('由于文件较大，请您打开浏览器手动下载。')
-                        success('下载地址：' + gamelist[game_version-1]['url'])
-                        success(f'下载完成后请将文件({gamelist[game_version-1]['version']}.zip)放置在"gc"文件夹中。')
-                        warn('如果您已经完成上述操作，请按回车键继续。')
-                        input()
-                        if os.path.exists('gc'):
-                            if os.path.exists('gc/' + gamelist[game_version-1]['version'] + '.zip'):
-                                log('正在解压文件……')
-                                success('解压完成！')
-                            else:
-                                error('文件不存在！')
-                        else:
-                            error('操作未完成！')
-                            error('程序将在5秒后退出。')
-                            time.sleep(5)
-                            sys.exit()
+                        request = requests.get('https://raw.githubusercontent.com/CTCAKE/GC-Tools/main/reslist.json')
+                        if request.status_code == 200:
+                            reslist = json.loads(request.text)
+                            success('res文件较大，请前往网盘自行下载！')
+                            success(reslist[game_version-1]['url'])
+                            success('下载完成后，请将文件移动至gc文件夹中。')
+                            warn('请不要重命名文件。')
+                            while os.path.exists('gc/res_' + gamelist[game_version-1]['version'] + '.zip') == False:
+                                log('等待文件……', end='\r')
+                            success('已检测到文件，正在解压！')
                     else:
                         error('程序将在5秒后退出。')
                         time.sleep(5)
