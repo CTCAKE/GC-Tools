@@ -58,8 +58,8 @@ def download_gc():
                             extract_path = 'gc/' + gamelist[game_version-1]['version'] + '/res'
                             if os.path.exists(extract_path) == False:
                                 os.mkdir(extract_path)
-                            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                                zip_ref.extractall(extract_path)
+                            #with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                                #zip_ref.extractall(extract_path)
                             success('解压完成！')
                             with open('config.json','w',encoding='utf-8') as f:
                                 config['gc'] = 'gc/'
@@ -99,7 +99,7 @@ def download_gc():
                                     cls()
                             elif i == 'p':
                                 cls()
-                                success('下载链接:' + gamelist[game_version-1]['url'])
+                                success('下载链接:' + gamelist[game_version-1]['url_pan'])
                                 success('下载完成后，请将文件移动至gc文件夹中。')
                                 warn('请不要重命名文件。')
                                 s = '.'
