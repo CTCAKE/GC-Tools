@@ -61,8 +61,8 @@ def download_gc():
                             extract_path = 'gc/' + gamelist[game_version-1]['version'] + '/res'
                             if os.path.exists(extract_path) == False:
                                 os.mkdir(extract_path)
-                            #with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                                #zip_ref.extractall(extract_path)
+                            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                                zip_ref.extractall(extract_path)
                             success('解压完成！')
                             with open('config.json','w',encoding='utf-8') as f:
                                 config['gc'] = 'gc/'
@@ -128,7 +128,7 @@ def download_gc():
         error("网络连接错误：状态码：" + str(request.status_code))
         log("程序将在5秒后退出。")
         time.sleep(5)
-        sys.exit()
+        first()
 def run_jar(gamelist, i):
     os.system('cd gc/' + gamelist[int(i)-1] + ' && java -jar grasscutter.jar')         
 def start_server():
@@ -141,7 +141,9 @@ def start_server():
         error('未找到服务器文件，请先下载服务端。')
         log('程序将在5秒后退出。')
         time.sleep(5)
-
+        first()
+    if config['java'] == '':
+        scan_java()
     success('发现服务器列表：')
     for i in range(len(gamelist)):
         log(str(i+1) + '. ' + gamelist[i])
@@ -157,13 +159,18 @@ def start_server():
         main()
     else:
         log('正在启动服务器……')
+        first()
         with open(config['gc'] + '/' + gamelist[int(i)-1] + '/config.json','r',encoding='utf-8') as f:
             configa = json.load(f)
             configa['databaseInfo']['server']['connectionUri'] = 'mongodb://localhost:' + config['mongodb']
             configa['databaseInfo']['game']['connectionUri'] = 'mongodb://localhost:' + config['mongodb']
+            configa['server']['http']['accessAddress'] = config['server']
+            configa['server']['http']['accessPort'] = config['port']
             with open(config['gc'] + '/' + gamelist[int(i)-1] + '/config.json','w',encoding='utf-8') as f:
                 f.write(json.dumps(configa))
             success('Mongodb端口已修改为' + config['mongodb'])
+            success('Dispatch服务器监听地址已修改为' + config['server'])
+            success('Dispatch服务器端口已修改为' + str(config['port']))
         threading.Thread(target=run_jar, args=(gamelist,i,)).start()
         log('服务器正在启动……')
         
@@ -203,7 +210,7 @@ def scan_java():
         if match.group(1) < '17':
             error('JAVA版本过低，请使用JAVA17及以上版本。')
             time.sleep(3)
-            main()
+            first()
         with open('config.json','r',encoding='utf-8') as f:
             config = json.load(f)
             config['java'] = 'java' # 已经有环境变量了，不需要设置路径
@@ -213,10 +220,9 @@ def scan_java():
         error('未找到JAVA，请手动输入JAVA位置。')
         log('3秒后返回。')
         time.sleep(3)
-        main()
-
+        first()
+config = {}
 if __name__ == "__main__": #一些自检和初始化
-    config = {}
     init(autoreset=True)
     nowtime = int(time.strftime("%H", time.localtime()))
     if nowtime < 12:
@@ -229,26 +235,8 @@ if __name__ == "__main__": #一些自检和初始化
     log(f'{Fore.YELLOW}现在是' + t + time.strftime("%H:%M", time.localtime()) + '。')
     log("正在检测环境……")
     if os.path.exists('config.json'):
-        with open('config.json','r',encoding='utf-8') as f:
-            config = f.read()
-            if config == '':
-                log("配置文件为空，正在创建配置文件……")
-                with open('config.json','w',encoding='utf-8') as f:
-                    result = {
-                        "server": '0.0.0.0',
-                        "port": 12345,
-                        "game": '',
-                        "mongodb": '',
-                        "gc": '',
-                        "game_version": '',
-                        "java": ''
-                    }
-                    f.write(json.dumps(result))
-                success("配置文件创建成功，请重新启动程序。")
-                log('程序将在5秒后退出。')
-                time.sleep(5)
-                sys.exit()
-            else:
+            with open('config.json','r',encoding='utf-8') as f:
+                config = f.read()
                 config = json.loads(config)
                 success("检测完成。")
                 time.sleep(2)
@@ -262,108 +250,95 @@ if __name__ == "__main__": #一些自检和初始化
                 time.sleep(2)
                 cls()
                 log('正在启动服务器……')
-
-                # 配置检测
-                if config['game'] == '':
-                    error('游戏路径为空，请先配置游戏路径。')
-                    gamepath = input('[~] 请输入游戏路径(YuanShen.exe所在的文件夹 末尾要带\)：')
-                    if gamepath == '':
-                        error('游戏路径不能为空！')
-                        time.sleep(2)
-                        main()
-                    else:
-                        with open('config.json','r',encoding='utf-8') as f:
-                            config = json.loads(f.read())
-                            config['game'] = gamepath
-                            with open('config.json','w',encoding='utf-8') as f:
-                                f.write(json.dumps(config))
-                        success('游戏路径配置已生效。')
-                        time.sleep(2)
-                        main()
-                elif config['mongodb'] == '':
-                    error('MongoDB端口为空！')
-                    mongodbpath = input('[~] 请输入MongoDB 端口(n: 默认配置)：')
-                    if mongodbpath == 'n':
-                        success('已跳过，即将使用默认配置: 27017')
-                        with open('config.json','r+',encoding='utf-8') as f:
-                            config = json.loads(f.read())
-                            config['mongodb'] = '27017'
-                            with open('config.json','w',encoding='utf-8') as f:
-                                f.write(json.dumps(config))
-                        success('MongoDB端口已配置。')
-                        time.sleep(2)
-                        main()
-                        pass
-                    else:
-                        with open('config.json','r+',encoding='utf-8') as f:
-                            config = json.loads(f.read())
-                            config['mongodb'] = mongodbpath
-                            with open('config.json','w',encoding='utf-8') as f:
-                                f.write(json.dumps(config))
-                        success('MongoDB端口已配置。')
-                        error('3秒后返回')
-                        time.sleep(3)
-                        main()
-                elif config['game_version'] == '':
-                    log('正在获取游戏版本……')
-                    configa = configparser.ConfigParser()
-                    configa.read(config['game'] + 'config.ini')
-                    game_version = configa.get('general', 'game_version')
-                    success('游戏版本获取成功。')
-                    with open('config.json','r+',encoding='utf-8') as f:
-                        config = json.loads(f.read())
-                        config['game_version'] = game_version
-                        with open('config.json','w',encoding='utf-8') as f:
-                            f.write(json.dumps(config))
-                    success('游戏版本：' + game_version)
-                elif config['gc'] == '':
-                    error('割草机路径为空！')
-                    gcpath = input('[~] 请输入割草机路径(n: 自动下载)：')
-                    if gcpath == 'n':
-                        success('已跳过，即将下载割草机。')
-                        download_gc()
-                    else:
-                        with open('config.json','r+',encoding='utf-8') as f:
-                            config = json.loads(f.read())
-                            config['gc'] = gcpath
-                            with open('config.json','w',encoding='utf-8') as f:
-                                f.write(json.dumps(config))
-                        success('割草机路径已配置，重启程序生效。')
-                        error('程序将在3秒后退出。')
-                        time.sleep(3)
-                        sys.exit()
-    else:
-        log("正在创建配置文件……")
-        with open('config.json','w',encoding='utf-8') as f:
-            result = {
-                "server": '0.0.0.0',
-                "port": 12345,
-                "game": '',
-                "mongodb": '',
-                "gc": '',
-                "game_version": '',
-                "java": ''
-            }
-            f.write(json.dumps(result))
-        success("配置文件创建成功，请重新启动程序。")
-        error('程序将在3秒后退出。')
-        time.sleep(3)
-        sys.exit()
-    #获取java版本
-    if config['java'] == '':
-        error('Java路径为空！')
-        javapath = input('[~] 请输入Java路径(n: 自动搜索)：')
-        if javapath == 'n':
-            success('已跳过，即将搜索Java。')
-            scan_java()
-        else:
+    def first():
+        with open('config.json','r',encoding='utf-8') as f:
+            config = f.read()
+            config = json.loads(config)
+        if config['game'] == '':
+            error('游戏路径为空，请先配置游戏路径。')
+            gamepath = input('[~] 请输入游戏路径(YuanShen.exe所在的文件夹 末尾要带\)：')
+            if gamepath == '':
+                error('游戏路径不能为空！')
+                time.sleep(2)
+                first()
+            else:
+                with open('config.json','r',encoding='utf-8') as f:
+                    config = json.loads(f.read())
+                    config['game'] = gamepath
+                    with open('config.json','w',encoding='utf-8') as f:
+                        f.write(json.dumps(config))
+                success('游戏路径配置已生效。')
+                time.sleep(2)
+                first()
+        elif config['mongodb'] == '':
+            error('MongoDB端口为空！')
+            mongodbpath = input('[~] 请输入MongoDB 端口(n: 默认配置)：')
+            if mongodbpath == 'n':
+                success('已跳过，即将使用默认配置: 27017')
+                with open('config.json','r+',encoding='utf-8') as f:
+                    config = json.loads(f.read())
+                    config['mongodb'] = '27017'
+                    with open('config.json','w',encoding='utf-8') as f:
+                        f.write(json.dumps(config))
+                success('MongoDB端口已配置。')
+                time.sleep(2)
+                first()
+                pass
+            else:
+                with open('config.json','r+',encoding='utf-8') as f:
+                    config = json.loads(f.read())
+                    config['mongodb'] = mongodbpath
+                    with open('config.json','w',encoding='utf-8') as f:
+                        f.write(json.dumps(config))
+                success('MongoDB端口已配置。')
+                error('3秒后返回')
+                time.sleep(3)
+                first()
+        elif config['game_version'] == '':
+            log('正在获取游戏版本……')
+            configa = configparser.ConfigParser()
+            configa.read(config['game'] + 'config.ini')
+            game_version = configa.get('general', 'game_version')
+            success('游戏版本获取成功。')
             with open('config.json','r+',encoding='utf-8') as f:
                 config = json.loads(f.read())
-                config['java'] = javapath
+                config['game_version'] = game_version
                 with open('config.json','w',encoding='utf-8') as f:
                     f.write(json.dumps(config))
-            success('Java路径已配置，重启程序生效。')
+            success('游戏版本：' + game_version)
+
+        elif config['gc'] == '':
+            error('割草机路径为空！')
+            gcpath = input('[~] 请输入割草机路径(n: 自动下载)：')
+            if gcpath == 'n':
+                success('已跳过，即将下载割草机。')
+                download_gc()
+            else:
+                with open('config.json','r+',encoding='utf-8') as f:
+                    config = json.loads(f.read())
+                    config['gc'] = gcpath
+                    with open('config.json','w',encoding='utf-8') as f:
+                        f.write(json.dumps(config))
+                success('割草机路径已配置，重启程序生效。')
+                error('程序将在3秒后退出。')
+                time.sleep(3)
+                sys.exit()
+        elif config['java'] == '':
+            error('Java路径为空！')
+            javapath = input('[~] 请输入Java路径(n: 自动搜索)：')
+            if javapath == 'n':
+                success('已跳过，即将搜索Java。')
+                scan_java()
+            else:
+                with open('config.json','r+',encoding='utf-8') as f:
+                    config = json.loads(f.read())
+                    config['java'] = javapath
+                    with open('config.json','w',encoding='utf-8') as f:
+                        f.write(json.dumps(config))
+                success('Java路径已配置，重启程序生效。')
+    first()
     main()
+    
 
 
 
