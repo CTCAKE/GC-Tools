@@ -1,4 +1,5 @@
 from tqdm import tqdm
+import zipfile
 import time
 import threading
 from colorama import  init,Fore,Back,Style
@@ -44,12 +45,24 @@ def download_gc():
                         if request.status_code == 200:
                             reslist = json.loads(request.text)
                             success('res文件较大，请前往网盘自行下载！')
-                            success(reslist[game_version-1]['url'])
+                            success('下载链接:' + reslist[game_version-1]['url'])
                             success('下载完成后，请将文件移动至gc文件夹中。')
                             warn('请不要重命名文件。')
+                            s = '.'
                             while os.path.exists('gc/res_' + gamelist[game_version-1]['version'] + '.zip') == False:
-                                log('等待文件……', end='\r')
+                                s += '.'
+                                log('等待文件' + s, end='\r')
+                                time.sleep(1)
                             success('已检测到文件，正在解压！')
+                            zip_path = 'gc/res_' + gamelist[game_version-1]['version'] + '.zip'
+                            extract_path = 'gc/' + gamelist[game_version-1]['version']
+                            if os.path.exists(extract_path) == False:
+                                os.mkdir(extract_path)
+                            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                                zip_ref.extractall(extract_path)
+                            success('解压完成！')
+
+
                     else:
                         error('程序将在5秒后退出。')
                         time.sleep(5)
