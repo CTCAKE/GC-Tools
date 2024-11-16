@@ -67,23 +67,19 @@ def download_gc():
                             log('配置文件已更新！')
                             time.sleep(2)
                             cls()
-                            log('正在下载服务端……')
+                            log('——下载服务端——')
                             ask(f'请选择下载渠道(g[需魔法]/p[123盘]):')
                             i = input()
                             if i == 'g':
-                                def show_progress(block_num, block_size, total_size):
-                                    percent = 100.0 * block_num * block_size / total_size
-                                    sys.stdout.write('\r')
-                                    sys.stdout.write(f'{Fore.GREEN}[+] 下载进度：{percent:.2f}%')
-                                    sys.stdout.flush()
                                 request = requests.get(gamelist[game_version-1]['url'], stream=True)
-                                show_progress(0, 1, 1)
                                 if request.status_code == 200:
                                     with open('gc/' + gamelist[game_version-1]['version'] + '.zip', 'wb') as f:
                                         for chunk in request.iter_content(chunk_size=1024):
                                             if chunk:
                                                 f.write(chunk)
-                                                show_progress(1, 1024, 1)
+                                                size = os.path.getsize('gc/' + gamelist[game_version-1]['version'] + '.zip')
+                                                log('正在下载服务端……')
+                                                log(str(round(size/1024/1024,2)) + 'MB / ' + gamelist[game_version-1]['size'], end='\r')
                                     success('下载完成！')
                                     time.sleep(2)
                                     cls()
