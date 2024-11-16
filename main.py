@@ -6,14 +6,56 @@ import sys
 import json
 import keyboard
 import configparser
+import requests
 def log(text, end='\n'):
     print(f'[~] ' + text, end=end)
 def success(text, end='\n'):
     print(f'{Fore.GREEN}[+] ' + text, end=end)
 def error(text, end='\n'):
     print(f'{Fore.RED}[-] ' + text, end=end)
+def ask(text, end='\n'):
+    print(f'{Fore.YELLOW}[?] ' + text, end=end)
+def warn(text, end='\n'):
+    print(f'{Fore.YELLOW}[!] ' + text, end=end)
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
+def download_gc():
+    cls()
+    log("即将开始下载服务端")
+    log("正在获取版本列表……")
+    gamelist = []
+    request = requests.get('https://raw.githubusercontent.com/CTCAKE/GC-Tools/main/gamelist.json')
+    if request.status_code == 200:
+        gamelist = json.loads(request.text)
+        log("请选择游戏版本：")
+        for i in range(len(gamelist)):
+            log(str(i+1) + '. ' + gamelist[i]['version'])
+        game_version = input("请输入游戏版本编号：")
+        if game_version.isdigit():
+            game_version = int(game_version)
+            if game_version > 0 and game_version <= len(gamelist):
+                log('已选择游戏版本：' + gamelist[game_version-1]['version'])
+                if config['game_version'] != gamelist[game_version-1]['version']:
+                    ask(f'选择的服务端版本({gamelist[game_version-1]['version']})与您的游戏版本({config['game_version']})不一致，是否继续？(y/n)')
+                    i = input()
+                    if i == 'y':
+                        warn('由于文件较大，请您打开浏览器手动下载。')
+                        success('下载地址：' + gamelist[game_version-1]['url'])
+                        success('下载完成后请将文件放置在"gc"文件夹中。')
+                        warn('如果您已经完成上述操作，请按回车键继续。')
+                        input()
+
+                    else:
+                        success('程序将在5秒后退出。')
+                        time.sleep(5)
+                        sys.exit()
+
+    else:
+        error("网络连接错误：状态码：" + str(request.status_code))
+        log("程序将在5秒后退出。")
+        time.sleep(5)
+        sys.exit()
+            
 if __name__ == "__main__":
     config = {}
     init(autoreset=True)
@@ -103,6 +145,18 @@ if __name__ == "__main__":
                         error('程序将在3秒后退出。')
                         time.sleep(3)
                         sys.exit()
+                elif config['game_version'] == '':
+                    log('正在获取游戏版本……')
+                    configa = configparser.ConfigParser()
+                    configa.read(config['game'] + 'config.ini')
+                    game_version = configa.get('general', 'game_version')
+                    success('游戏版本获取成功。')
+                    with open('config.json','r+',encoding='utf-8') as f:
+                        config = json.loads(f.read())
+                        config['game_version'] = game_version
+                        with open('config.json','w',encoding='utf-8') as f:
+                            f.write(json.dumps(config))
+                    success('游戏版本：' + game_version)
                 elif config['gc'] == '':
                     error('割草机路径为空！')
                     gcpath = input('[~] 请输入割草机路径(n: 自动下载)：')
@@ -119,30 +173,18 @@ if __name__ == "__main__":
                         error('程序将在3秒后退出。')
                         time.sleep(3)
                         sys.exit()
-                elif config['game_version'] == '':
-                    log('正在获取游戏版本……')
-                    configa = configparser.ConfigParser()
-                    configa.read(config['game'] + 'config.ini')
-                    game_version = configa.get('general', 'game_version')
-                    success('游戏版本获取成功。')
-                    with open('config.json','r+',encoding='utf-8') as f:
-                        config = json.loads(f.read())
-                        config['game_version'] = game_version
-                        with open('config.json','w',encoding='utf-8') as f:
-                            f.write(json.dumps(config))
-                    success('游戏版本：' + game_version)
-
+                
                 # 配置检测完成
-                else:
-                    success('配置检测完成。')
-                    time.sleep(1)
-                    success('正在启动游戏服务器……')
+    
+                success('配置检测完成。')
+                time.sleep(1)
+                success('正在启动游戏服务器……')
 
-                    time.sleep(1)
-                    success('游戏已启动。')
-                    time.sleep(1)
-                    success('正在连接MongoDB……')
-                    time.sleep(1)
+                time.sleep(1)
+                success('游戏已启动。')
+                time.sleep(1)
+                success('正在连接MongoDB……')
+                time.sleep(1)
 
 
                     
