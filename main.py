@@ -55,14 +55,66 @@ def download_gc():
                                 time.sleep(1)
                             success('已检测到文件，正在解压！')
                             zip_path = 'gc/res_' + gamelist[game_version-1]['version'] + '.zip'
-                            extract_path = 'gc/' + gamelist[game_version-1]['version']
+                            extract_path = 'gc/' + gamelist[game_version-1]['version'] + '/res'
                             if os.path.exists(extract_path) == False:
                                 os.mkdir(extract_path)
                             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                                 zip_ref.extractall(extract_path)
                             success('解压完成！')
-
-
+                            with open('config.json','w',encoding='utf-8') as f:
+                                config['gc'] = 'gc/'
+                                f.write(json.dumps(config))
+                            log('配置文件已更新！')
+                            time.sleep(2)
+                            cls()
+                            log('正在下载服务端……')
+                            ask(f'请选择下载渠道(g[需魔法]/p[123盘]):')
+                            i = input()
+                            if i == 'g':
+                                def show_progress(block_num, block_size, total_size):
+                                    percent = 100.0 * block_num * block_size / total_size
+                                    sys.stdout.write('\r')
+                                    sys.stdout.write(f'{Fore.GREEN}[+] 下载进度：{percent:.2f}%')
+                                    sys.stdout.flush()
+                                request = requests.get(gamelist[game_version-1]['url'], stream=True)
+                                show_progress(0, 1, 1)
+                                if request.status_code == 200:
+                                    with open('gc/' + gamelist[game_version-1]['version'] + '.zip', 'wb') as f:
+                                        for chunk in request.iter_content(chunk_size=1024):
+                                            if chunk:
+                                                f.write(chunk)
+                                                show_progress(1, 1024, 1)
+                                    success('下载完成！')
+                                    time.sleep(2)
+                                    cls()
+                                    log('正在解压服务端……')
+                                    zip_path = 'gc/' + gamelist[game_version-1]['version'] + '.zip'
+                                    extract_path = 'gc/' + gamelist[game_version-1]['version']
+                                    if os.path.exists(extract_path) == False:
+                                        os.mkdir(extract_path)
+                                    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                                        zip_ref.extractall(extract_path)
+                                    success('解压完成！')
+                                    time.sleep(2)
+                                    cls()
+                            elif i == 'p':
+                                cls()
+                                success('下载链接:' + gamelist[game_version-1]['url'])
+                                success('下载完成后，请将文件移动至gc文件夹中。')
+                                warn('请不要重命名文件。')
+                                s = '.'
+                                while os.path.exists('gc/' + gamelist[game_version-1]['version'] + '.zip') == False:
+                                    s += '.'
+                                    log('等待文件' + s, end='\r')
+                                    time.sleep(1)
+                                success('已检测到文件，正在解压！')
+                                zip_path = 'gc/' + gamelist[game_version-1]['version'] + '.zip'
+                                extract_path = 'gc/' + gamelist[game_version-1]['version']
+                                if os.path.exists(extract_path) == False:
+                                    os.mkdir(extract_path)
+                                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                                    zip_ref.extractall(extract_path)
+                                success('解压完成！')
                     else:
                         error('程序将在5秒后退出。')
                         time.sleep(5)
