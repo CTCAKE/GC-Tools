@@ -41,12 +41,22 @@ def download_gc():
                     if i == 'y':
                         warn('由于文件较大，请您打开浏览器手动下载。')
                         success('下载地址：' + gamelist[game_version-1]['url'])
-                        success('下载完成后请将文件放置在"gc"文件夹中。')
+                        success(f'下载完成后请将文件({gamelist[game_version-1]['version']}.zip)放置在"gc"文件夹中。')
                         warn('如果您已经完成上述操作，请按回车键继续。')
                         input()
-
+                        if os.path.exists('gc'):
+                            if os.path.exists('gc/' + gamelist[game_version-1]['version'] + '.zip'):
+                                log('正在解压文件……')
+                                success('解压完成！')
+                            else:
+                                error('文件不存在！')
+                        else:
+                            error('操作未完成！')
+                            error('程序将在5秒后退出。')
+                            time.sleep(5)
+                            sys.exit()
                     else:
-                        success('程序将在5秒后退出。')
+                        error('程序将在5秒后退出。')
                         time.sleep(5)
                         sys.exit()
 
